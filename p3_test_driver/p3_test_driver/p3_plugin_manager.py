@@ -14,10 +14,13 @@ _plugin_toc = {}
 def _get_item_key(class_type, class_name):
     return '%s:%s' % (class_type, class_name)
 
-def _get_plugin_dir():
+def _get_plugin_dirs():
     logging.info(p3_test_driver.__file__)
     maindir = os.path.dirname(os.path.realpath(p3_test_driver.__file__))
-    return os.path.join(maindir, 'plugins')
+    return [
+        os.path.join(maindir, 'plugins'),
+        os.path.join(os.getcwd(), 'p3_test_driver_plugins'),
+    ]
 
 def scan_plugins():
     global _plugin_toc
@@ -27,9 +30,9 @@ def scan_plugins():
     analyzer = PluginFileAnalyzerMathingRegex('', '.*\\.py$')
     plugin_locator = PluginFileLocator(analyzers=[analyzer])
     manager = PluginManager(plugin_locator=plugin_locator)
-    plugin_dir = _get_plugin_dir()
-    logging.info('Loading plugins in %s' % os.path.join(plugin_dir, '*.py'))
-    manager.setPluginPlaces([plugin_dir])
+    plugin_dirs = _get_plugin_dirs()
+    logging.info('Loading plugins in %s' % str(plugin_dirs))
+    manager.setPluginPlaces(plugin_dirs)
     manager.collectPlugins()
 
     # Loop round the plugins and print their names.
