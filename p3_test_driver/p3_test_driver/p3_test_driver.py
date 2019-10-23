@@ -14,6 +14,7 @@ import time
 import logging
 import optparse
 import traceback
+import yaml
 
 # P3 Libraries
 from .p3_util import record_result, regex_first_group, public_dict, mkdir_for_file
@@ -139,7 +140,7 @@ def main():
 
     # Initialize logging
     rootLogger = logging.getLogger()
-    rootLogger.setLevel(logging.INFO)
+    rootLogger.setLevel(options.log_level)
     consoleHandler = logging.StreamHandler(sys.stdout)
     logging.Formatter.converter = time.gmtime
     consoleHandler.setFormatter(logging.Formatter('%(asctime)s %(message)s'))
@@ -157,15 +158,12 @@ def main():
     # Load plugins
     p3_plugin_manager.scan_plugins()
 
-    # Set actual logging level after plugins are loaded to avoid excessive debug messages.
-    rootLogger.setLevel(options.log_level)
-
     # Build test configs
     configs = []
     for tests_filename in options.tests:
         if tests_filename == '-':
             try:
-                file_test_configs = json.load(sys.stdin)
+                file_test_configs = yaml.load(sys.stdin)
             except Exception as e:
                 logging.error('Unable to parse stdin')
                 raise
