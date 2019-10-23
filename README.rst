@@ -20,6 +20,7 @@ It currently runs the following benchmarks:
 - TPC-DS (Hive, HAWQ, Impala)
 - TPCx-HS
 - YCSB (HBase)
+- Any other command-line application
 
 Although it can perform tests on any storage system, it comes with plugins that provide special support
 for EMC Isilon Scale-out NAS and EMC Elastic Cloud Storage (ECS) platforms.
@@ -37,10 +38,10 @@ the benchmark results. For instance, in a MapReduce job, changing the number of 
 Normally, there is an optimal number of reducers for a particular job and values far away from this optimal value will 
 result in reduced performance.
 
-The P3 Test Driver can run in two modes (again, these modes are defined by a replacable plugin).
-The simplist mode is simply to run tests using parameters that are completely defined by the user.
+The P3 Test Driver can run in two modes (again, these modes are defined by a replaceable plugin).
+The easiest mode is simply to run tests using parameters that are completely defined by the user.
 For instance, the user may specify that they want to run Terasort with 10, 30, 100, and 300 reducers in order to
-see which one is fasteset. 
+see which one is fastest.
 This can be extended along multiple dimensions to perform a simple grid search.
 For instance, if the user also wanted to test with different
 values of the reducer memory (i.e. 2048, 4096, and 8192 MB), then a cartesian product of these two
@@ -63,7 +64,7 @@ Prerequisites
     the Hadoop client so that it can stop and start jobs.
     The following Linux distributions have been tested.
     - CentOS 6.6, 6.7, 7.2
-    - Ubuntu 12.04
+    - Ubuntu 12.04, 18.04
   
 #.  Times on all compute nodes must be synchronized to within a second, preferably using NTP.
     
@@ -71,25 +72,6 @@ Prerequisites
     Although not strictly required, this makes troubleshooting distributed systems much simpler.
 
 #.  To collect Linux metrics, nmon version 14g should be installed on all Linux hosts.
-
-*************************
-Quick Installation in Lab
-*************************
-
-Use this when everything is already installed on a mounted NFS share.
-
-[user\@driver-server p3_test_driver]#
-
-mkdir -p .ssh
-cp /mnt/home/faheyc/ssh/id_rsa* ~/.ssh/
-chmod go-r .ssh/id_rsa*
-
-Create file ~/.ssh/config with following contents:
-Host *
-   StrictHostKeyChecking no
-   UserKnownHostsFile /dev/null
-
-export PATH=/mnt/home/faheyc/anaconda/bin:$PATH
 
 
 ***********************************
@@ -135,10 +117,19 @@ Installation
 ************
 
 Although the Python runtime that is installed by default in Linux can often be used, it is
-significantly easier to use the Python runtime provided by Anaconda as it makes
+significantly easier to use the Python runtime provided by VirtualEnv or Anaconda as it makes
 it very easy to install all required packages and it will not interfere with any other
 applications that use Python.
 
+
+Basic Installation using VirtualEnv (Recommended)
+-------------------------------------------------
+
+Perform these steps on the Linux server that will run the P3 Test Driver.
+
+#. virtualenv -p python3 venv
+#. source venv/bin/activate
+#. ./install.sh
 
 Basic Installation using Anaconda
 ---------------------------------
@@ -385,8 +376,7 @@ For example:
 
 .. parsed-literal::
 
-  [user\@driver-server p3_test_driver]# **export PATH=/opt/anaconda/bin:$PATH**
-  [user\@driver-server p3_test_driver]# **tests/testgen_terasort_das.py | ./p3_test_driver.py \
+  [user\@driver-server p3_test_driver]# **tests/testgen_terasort_das.py | p3_test_driver \
   --config my_hadoop_cluster.json --config my_storage_cluster.json \
   --tests -**
 
