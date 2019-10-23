@@ -1,0 +1,13 @@
+*.iml
+*.json
+*.log
+*.pyc
+*.egg-info
+.idea/*
+.ipynb_checkpoints/*
+data/*
+logs/*
+venv/*
+!example*.json
+!dummy*.json
+!tests/*unit_tests.tests.json
