@@ -1,13 +1,14 @@
 # Written by Claudio Fahey (claudio.fahey@emc.com)
 
 from __future__ import division
+
 import logging
-import subprocess
 import queue as Queue
 import threading
 
 # P3 Libraries
-from .system_command import popen_to_queue, system_command, ssh, BackgroundProcess
+from .system_command import BackgroundProcess
+
 
 class MetricsAgent:
     """Represents a single process that is executed to produce metrics on stdout or stderr"""

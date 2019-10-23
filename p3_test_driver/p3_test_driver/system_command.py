@@ -1,12 +1,13 @@
 # Written by Claudio Fahey (claudio.fahey@emc.com)
 
 from __future__ import division
-import subprocess
-import sys
+
 import datetime
-import queue as Queue
 import logging
+import queue as Queue
+import subprocess
 import threading
+
 
 def time_duration_to_seconds(td):
     return (td.microseconds + (td.seconds + td.days * 24 * 60 * 60) * 10.**6) / 10.**6

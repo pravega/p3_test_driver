@@ -1,22 +1,12 @@
 #!/usr/bin/env python
 # Written by Claudio Fahey (claudio.fahey@emc.com)
-# Run under Python 2.6.6 or higher 2.x.
 
 from __future__ import division
-import subprocess
-import sys
-import os
-import shutil
-import json
-import uuid
-import datetime
+
 import time
-import logging
-import optparse
-import traceback
 
 # P3 Libraries
-from .application_status_tree import StatusTree, StatusTreeServer
+from .application_status_tree import StatusTreeServer
 
 root = StatusTreeServer(status_file='/tmp/status.html')
 with root.context():

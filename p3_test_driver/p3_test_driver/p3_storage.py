@@ -1,7 +1,7 @@
 # Written by Claudio Fahey (claudio.fahey@emc.com)
 
 from __future__ import division
-import logging
+
 
 class StorageBase:
     def __init__(self, config):

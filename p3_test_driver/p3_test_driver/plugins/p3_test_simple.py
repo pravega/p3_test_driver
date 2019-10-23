@@ -2,18 +2,16 @@
 # Written by Claudio Fahey (claudio.fahey@emc.com)
 
 from __future__ import division
+
+import datetime
 import logging
 import os
-import sys
-import datetime
 
 # P3 Libraries
 from p3_test_driver import p3_plugin_manager
-import p3_test_driver.p3_storage
-from p3_test_driver.p3_metrics import MetricsCollector
+from p3_test_driver.p3_test import TimeoutException, StorageTest
 from p3_test_driver.p3_util import record_result
 from p3_test_driver.system_command import system_command, time_duration_to_seconds
-from p3_test_driver.p3_test import TimeoutException, StorageTest
 
 _default_configs = {
     'simple': {

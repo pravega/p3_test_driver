@@ -1,26 +1,25 @@
 #!/usr/bin/env python
 # Written by Claudio Fahey (claudio.fahey@emc.com)
-# Run under Python 2.6.6 or higher 2.x.
 
 from __future__ import division
-import subprocess
-import sys
-import os
-import shutil
-import json
-import uuid
+
 import datetime
-import time
+import json
 import logging
 import optparse
+import os
+import sys
+import time
 import traceback
+import uuid
+
 import yaml
 
 # P3 Libraries
-from .p3_util import record_result, regex_first_group, public_dict, mkdir_for_file
-from .json_util import load_json_from_file
 from . import p3_plugin_manager
 from .application_status_tree import StatusTreeServer
+from .json_util import load_json_from_file
+from .p3_util import public_dict, mkdir_for_file
 
 app_ver = '2.0'
 global_error_count = 0;
