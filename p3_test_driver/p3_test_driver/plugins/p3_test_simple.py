@@ -47,6 +47,31 @@ class SimpleTest(StorageTest):
 
         self.configure_environment()
 
+        # Build environment for commands.
+        env = None
+        command_env = rec.get('command_env')
+        if command_env:
+            env = dict(os.environ)
+            env.update(command_env)
+
+        # Run pre-commands.
+        for pre_command in rec.get('pre_commands', []):
+            pre_command_template = pre_command['command_template']
+            if isinstance(pre_command_template, list):
+                cmd = [x % rec for x in pre_command_template]
+            else:
+                cmd = pre_command_template % rec
+            return_code, output, errors = system_command(cmd,
+                print_command=True,
+                print_output=True,
+                timeout=rec.get('command_timeout_sec',None),
+                raise_on_error=True,
+                shell=not isinstance(cmd, list),
+                noop=False,
+                env=env)
+            if 'key' in pre_command:
+                rec[pre_command['key']] = output.rstrip()
+
         # Build command from command template.
         if 'command' not in rec and 'command_template' in rec:
             if isinstance(rec['command_template'], list):
@@ -58,12 +83,6 @@ class SimpleTest(StorageTest):
         if 'command_shell' not in rec:
             rec['command_shell'] = not isinstance(cmd, list)
 
-        # Build environment for command.
-        env = None
-        command_env = rec.get('command_env')
-        if command_env:
-            env = dict(os.environ)
-            env.update(command_env)
 
         rec['_status_node'].set_status('Running command: %s' % str(cmd))
 

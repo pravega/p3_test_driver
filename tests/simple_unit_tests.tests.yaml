@@ -7,4 +7,3 @@
   command_template: ["/bin/echo", "%(test)s", "%(test_uuid)s", "%(param1)s"]
   result_filename: /tmp/simple.json
   param1: param1value
-- test: dummytest1
