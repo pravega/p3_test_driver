@@ -16,7 +16,7 @@ def load_json_from_file(filename):
             data = json.load(reader(data_file))
     elif ext == '.yaml':
         with open(filename) as data_file:
-            data = yaml.load(data_file)        
+            data = yaml.full_load(data_file)
     else:
         with open(filename) as data_file:
             data = json.load(data_file)

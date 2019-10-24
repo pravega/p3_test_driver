@@ -162,7 +162,7 @@ def main():
     for tests_filename in options.tests:
         if tests_filename == '-':
             try:
-                file_test_configs = yaml.load(sys.stdin)
+                file_test_configs = yaml.full_load(sys.stdin)
             except Exception as e:
                 logging.error('Unable to parse stdin')
                 raise
