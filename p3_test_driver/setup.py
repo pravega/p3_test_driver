@@ -13,6 +13,7 @@ setup(
         'p3_test_driver': ['plugins/*.py'],
     },
     install_requires=[
+        'requests',
         'six',
         'PyYaml',
         'yapsy',
