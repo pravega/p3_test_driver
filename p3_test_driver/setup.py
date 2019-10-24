@@ -7,7 +7,7 @@ setup(
     description='P3 Test Driver is designed to run a variety of benchmarks using an easily expandble plug-in system.',
     url='http://github.com/claudiofahey/p3_test_driver',
     author='Claudio Fahey',
-    author_email='claudiofahey@gmail.com',
+    author_email='claudio.fahey@dell.com',
     packages=['p3_test_driver'],
     install_requires=[
         'six',
