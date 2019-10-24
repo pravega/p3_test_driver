@@ -9,12 +9,15 @@ setup(
     author='Claudio Fahey',
     author_email='claudio.fahey@dell.com',
     packages=['p3_test_driver'],
+    package_data={
+        'p3_test_driver': ['plugins/*.py'],
+    },
     install_requires=[
         'six',
         'PyYaml',
         'yapsy',
     ],
-    entry_points = {
+    entry_points={
         'console_scripts': [
             'p3_test_driver = p3_test_driver.p3_test_driver:main',
         ],
