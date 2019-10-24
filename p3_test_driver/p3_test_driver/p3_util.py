@@ -103,7 +103,7 @@ def grid_to_config_list(grid):
 
 def configure_sysctl(user, host, settings):
     if settings:
-        args = ['sysctl -w %s="%s"' % (k,v) for k,v in settings.iteritems()]
+        args = ['sysctl -w %s="%s"' % (k,v) for k,v in settings.items()]
         cmd = ' && '.join(args)
         ssh(user, host, cmd)
 
@@ -112,14 +112,14 @@ def configure_sys_files(user, host, settings):
     settings = {"/sys/block/sd*/queue/nr_requests": 128}
     """
     if settings:
-        args = ['for f in %s ; do (echo %s > \\$f) ; done' % (k,v) for k,v in settings.iteritems()]
+        args = ['for f in %s ; do (echo %s > \\$f) ; done' % (k,v) for k,v in settings.items()]
         cmd = ' && '.join(args)
         ssh(user, host, cmd)
 
 def unflatten_dict_keys(d, key_regex):
     """Extract key/value pairs from dict d whose key match key_regex. Keys will be renamed to first group returned by regex."""
     result = {}
-    for k,v in d.iteritems():
+    for k,v in d.items():
         new_k = regex_first_group(key_regex, k)
         if new_k:
             result[new_k] = v

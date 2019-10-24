@@ -113,7 +113,7 @@ class IsilonStorage(StorageBase):
             cmd = 'isi network interfaces list --verbose --show-inactive'
         else:
             cmd = 'isi networks list interfaces --verbose --wide --show-inactive'
-        exit_code, output = ssh(config['isilon_user'], config['isilon_host'], cmd, print_output=False)
+        exit_code, output, errors = self.run_isilon_command(cmd, print_output=False)
         if exit_code != 0:
             raise Exception('Unable to get Isilon network interface info.')
         config['isilon_network_interface_info'] = output

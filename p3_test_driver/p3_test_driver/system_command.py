@@ -12,6 +12,7 @@ import threading
 def time_duration_to_seconds(td):
     return (td.microseconds + (td.seconds + td.days * 24 * 60 * 60) * 10.**6) / 10.**6
 
+
 def popen_to_queue(popen, pipe, q, message_type='system_command_output', message_data=None, send_return_code=True):
     """Warning: If watching stdout and stderr, only one should have send_return_code=True. Otherwise, p.returncode will be inconsistent."""
     if message_data is None:
@@ -34,10 +35,13 @@ def popen_to_queue(popen, pipe, q, message_type='system_command_output', message
     msg.update({'message_type': 'system_command_result', 'returncode': return_code, 'utc': datetime.datetime.utcnow().isoformat()})
     q.put(msg)
 
+
 def system_command(cmd, print_command=True, print_output=False, raise_on_error=True, shell=True, timeout=None, noop=False, env=None):
     """Execute an external application with options to print the output as it comes or kill
     the application after a timeout.
-    Returns the tuple (return_code, output, errors). return_code is -1 on timeout."""
+    Returns the tuple (return_code, output, errors).
+    return_code is -1 on timeout.
+    output and errors are strings."""
     
     if print_command:
         if isinstance(cmd, list):
@@ -110,6 +114,8 @@ def system_command(cmd, print_command=True, print_output=False, raise_on_error=T
         thread_stderr.join()
     else:
         output, errors = p.communicate()
+        output = output.decode()
+        errors = errors.decode()
         try:
             p.kill()
         except:
@@ -127,7 +133,12 @@ def system_command(cmd, print_command=True, print_output=False, raise_on_error=T
 
     return return_code, output, errors
 
+
 def ssh(user, host, command, opts='', raise_on_error=True, stderr_to_stdout=True, print_output=True, secure=True):
+    """Execute an SSH command.
+    Returns the tuple (return_code, output, errors).
+    return_code is -1 on timeout.
+    output and errors are strings."""
     escaped_command = command.replace('"', '\\"')
     opts_with_space = ''
     if opts: opts_with_space = '%s ' % opts
@@ -142,6 +153,7 @@ def ssh(user, host, command, opts='', raise_on_error=True, stderr_to_stdout=True
         return (returncode, output)
     else:
         return (returncode, output, errors)
+
 
 class BackgroundProcess:
     def __init__(self, queue, cmd, shell=True, message_data=None, start=True):

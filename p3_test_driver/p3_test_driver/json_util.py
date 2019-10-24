@@ -27,7 +27,8 @@ def save_json_to_file(data, filename, sort_keys=False, indent=None, ensure_ascii
     temp_file_name = '%s.tmp%s' % os.path.splitext(filename)    
     if ext == '.bz2':
         with closing(bz2.BZ2File(temp_file_name, 'wb')) as data_file:
-            json.dump(data, data_file, sort_keys=sort_keys, indent=indent, ensure_ascii=ensure_ascii)
+            s = json.dumps(data, sort_keys=sort_keys, indent=indent, ensure_ascii=ensure_ascii)
+            data_file.write(s.encode())
     else:
         with open(temp_file_name, 'w') as data_file:
             json.dump(data, data_file, sort_keys=sort_keys, indent=indent, ensure_ascii=ensure_ascii)
