@@ -134,19 +134,22 @@ def system_command(cmd, print_command=True, print_output=False, raise_on_error=T
     return return_code, output, errors
 
 
-def ssh(user, host, command, opts='', raise_on_error=True, stderr_to_stdout=True, print_output=True, secure=True):
+def ssh(user, host, command, opts='', raise_on_error=True, stderr_to_stdout=True, print_output=True, secure=True, noop=False):
     """Execute an SSH command.
     Returns the tuple (return_code, output, errors).
     return_code is -1 on timeout.
     output and errors are strings."""
     escaped_command = command.replace('"', '\\"')
     opts_with_space = ''
+    user_param = ''
+    if user:
+        user_param = '%s@' % user
     if opts: opts_with_space = '%s ' % opts
     if not secure: opts_with_space += '-o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null '
-    cmd = 'ssh %s%s@%s "%s"' % (opts_with_space, user, host, escaped_command)
+    cmd = 'ssh %s%s%s "%s"' % (opts_with_space, user_param, host, escaped_command)
     if stderr_to_stdout:
         cmd += ' 2>&1'
-    returncode, output, errors = system_command(cmd, print_command=True, raise_on_error=raise_on_error, print_output=print_output)
+    returncode, output, errors = system_command(cmd, print_command=True, raise_on_error=raise_on_error, print_output=print_output, noop=noop)
     if not raise_on_error:
         logging.info('Exit code=%d' % returncode)
     if stderr_to_stdout:
