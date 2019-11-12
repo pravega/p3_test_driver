@@ -5,13 +5,13 @@ P3 Test Driver
 
 General Purpose Pluggable System Test Driver
 
-Claudio Fahey (claudio.fahey@emc.com)
+Claudio Fahey (claudio.fahey@dell.com)
 
 ********
 Overview
 ********
 
-The P3 Test Driver is designed to run a variety of benchmarks using an easily expandble plug-in system.
+The P3 Test Driver is designed to run a variety of benchmarks using an easily expandable plug-in system.
 
 It currently runs the following benchmarks:
 
@@ -23,7 +23,7 @@ It currently runs the following benchmarks:
 - Any other command-line application
 
 Although it can perform tests on any storage system, it comes with plugins that provide special support
-for EMC Isilon Scale-out NAS and EMC Elastic Cloud Storage (ECS) platforms.
+for Dell EMC Isilon Scale-out NAS and Dell EMC ECS platforms.
 
 It is intended to be relatively lightweight in that it only requires the Python runtime and several Python libraries 
 to be installed on a single "driver" node.
@@ -38,8 +38,6 @@ the benchmark results. For instance, in a MapReduce job, changing the number of 
 Normally, there is an optimal number of reducers for a particular job and values far away from this optimal value will 
 result in reduced performance.
 
-The P3 Test Driver can run in two modes (again, these modes are defined by a replaceable plugin).
-The easiest mode is simply to run tests using parameters that are completely defined by the user.
 For instance, the user may specify that they want to run Terasort with 10, 30, 100, and 300 reducers in order to
 see which one is fastest.
 This can be extended along multiple dimensions to perform a simple grid search.
@@ -47,13 +45,6 @@ For instance, if the user also wanted to test with different
 values of the reducer memory (i.e. 2048, 4096, and 8192 MB), then a cartesian product of these two
 dimensions could be created and every possibility would be executed. 
 In this example, there would be 4*3 = 12 different sets of parameters that would be tested. 
-
-As more dimensions (variables) are added, the number of parameter combinations to be tested in such 
-a grid search becomes large very quickly. 
-To deal with this, the P3 Test Driver has an optimzation mode based on the Metrics Optimization Engine (MOE)
-developed at Yelp (see https://github.com/Yelp/moe). 
-The goal of this optimization mode is to automatically find the best set of parameters
-for the particular benchmark. See the Optimization section below for details.   
 
 
 *************
@@ -87,29 +78,7 @@ run the test. In a lab environment, the root user can be used.
 
 When logging in to the driver node as this user, you should ensure that your session will not be interrupted
 by a disconnected VPN or WAN link. It is recommended to use a console that is on the same LAN as the 
-driver node.
-
-
-*****************
-Password-less SSH
-*****************
-
-Password-less SSH is required from the user and server running the P3 Test Driver to all other servers involved in the
-test. This can be configured in a variety of ways. 
-The easiest method is to use configure-ssh.py from 
-https://github.com/claudiofahey/devops-scripts/blob/master/configure-ssh.py.
-
-.. parsed-literal::
-
-  [root\@driver-server p3_test_driver]# rpm -i centos6/sshpass*.rpm
-  [user\@driver-server p3_test_driver]# ssh-keygen -t rsa -b 4096
-  [user\@driver-server p3_test_driver]# configure-ssh.py -u root -p mypassword worker1 worker2 worker3
-
-Alternatively:
-
-.. parsed-literal::
-
-  [user\@driver-server p3_test_driver]# for n in {001..010} ; do ./configure-ssh.py -u root -p mypassword node$n.example.com ; done
+driver node. Consider using the Linux screen application.
 
 
 ************
@@ -117,7 +86,7 @@ Installation
 ************
 
 Although the Python runtime that is installed by default in Linux can often be used, it is
-significantly easier to use the Python runtime provided by VirtualEnv or Anaconda as it makes
+significantly easier to use the Python runtime provided by VirtualEnv as it makes
 it very easy to install all required packages and it will not interfere with any other
 applications that use Python.
 
@@ -129,107 +98,7 @@ Perform these steps on the Linux server that will run the P3 Test Driver.
 
 #. virtualenv -p python3 venv
 #. source venv/bin/activate
-#. ./install.sh
-
-Basic Installation using Anaconda
----------------------------------
-
-Perform these steps on the Linux server that will run the P3 Test Driver.
-The commands below are for CentOS 6.6 but this is expected to work under Ubuntu or other
-distributions with the appropriate commands.
-
-#. Using your browser, download Anaconda for Linux 64-bit, Python 2.7 from https://www.continuum.io/downloads. 
-#. sudo bash ./Anaconda2-2.4.1-Linux-x86_64.sh -b -p /opt/anaconda
-#. export PATH=/opt/anaconda/bin:$PATH
-#. conda update anaconda
-#. conda install pyramid
-#. pip install yapsy simplejson colander
-
-To configure the current shell instance to use Anaconda Python, set the path
-using the command shown below. This must be repeated whenever a new shell instance starts.
-
-.. parsed-literal::
-
-  [user\@driver-server p3_test_driver]# **export PATH=/opt/anaconda/bin:$PATH**
-
-
-Additional Installation Steps to Enable Optmization
----------------------------------------------------
-
-To use the automatic optimization feature of the P3 Test Driver, MOE must be installed.
-If you do not need to use the optimization feature at this time, this section can be skipped.
-
-There are two components that must be installed. 
-First, the MOE docker container must be installed. This runs a web service that the P3 Test Driver
-will call in order to perform the necessary calculations. When MOE is used to optimize a system
-with many historical points (in the hundreds) and/or many dimensions (5 or more), it can be very
-CPU intensive. For this reason, the MOE docker container should be installed on a server that it outside of
-the system to be tested, preferrably with 32 or more cores.
-
-For more details regarding MOE, see https://github.com/Yelp/moe.
-
-Install Docker
-==============
-
-Before installing the MOE Docker container, Docker must be installed.
-
-#. wget -qO- https://get.docker.com/gpg | sudo apt-key add -
-#. wget -qO- https://get.docker.com/ | sh
-
-Direct Download of MOE Docker Image
-===================================
-
-Use this method if you have a direct Internet connection.
-
-#. sudo docker pull yelpmoe/latest
-#. sudo docker run -p 6543:6543 yelpmoe/latest
-       
-Indirect Download of MOE Docker Image
-=====================================
-
-Use this method if the system that you want to install the MOE Docker container does not
-have Internet access.
-
-#. other host: sudo docker pull yelpmoe/latest
-#. other host: docker save yelpmoe/latest | bzip2 > yelpmoe.tar.bz2
-#. bunzip2 < yelpmoe.tar.bz2 | docker load 
-#. sudo docker images
-#. sudo docker run -p 6543:6543 9bb6643de2e6
-
-Install MOE Client Library
-==========================
-
-The MOE client library must be installed on the Linux server that will run the 
-P3 Test Driver.
-
-#. yum install git
-#. git clone https://github.com/Yelp/MOE
-#. cd MOE
-#. export PATH=/opt/anaconda/bin:$PATH
-#. export MOE_NO_BUILD_CPP=True
-#. python setup.py install
-#. Test:
-
-   #. python
-   #. >>> from moe.easy_interface.simple_endpoint import gp_next_points
-   #. >>> import yapsy
-   #. >>> exit()
-
-
-Prepare Hadoop for Benchmarks
------------------------------
-
-.. parsed-literal::
-
-  [hdfs\@hadoop-master-0 ~]# hdfs dfs -mkdir -p /benchmarks
-  [hdfs\@hadoop-master-0 ~]# hdfs dfs -chmod -R 777 /benchmarks
-
-.. parsed-literal::
-
-  [root\@hadoop-master-0 ~]# adduser hduser1
-  [hdfs\@hadoop-master-0 ~]# hdfs dfs -mkdir -p /user/hduser1
-  [hdfs\@hadoop-master-0 ~]# hdfs dfs -chown hduser1:hduser1 /user/hduser1
-  [hdfs\@hadoop-master-0 ~]# hdfs dfs -chmod -R a+rwX /user/hduser1
+#. pip install p3_test_driver
 
 
 ****************************
@@ -320,7 +189,7 @@ Automatically Generating Test Files
 
 A user will often want to run a large number of tests using the P3 Test Driver.
 Of course, this can be performed simply by typing out a very large JSON file describing
-all of the tests to run. However, a better approach is to programatically create the JSON file
+all of the tests to run. However, a better approach is to programmatically create the JSON file
 that describes all of the tests.
 
 For an example, see the Python script tests/testgen_terasort_das.py. This will iterate over several
@@ -382,6 +251,55 @@ For example:
 
 The previous command-line will run a set of Terasort suite tests on a particular Hadoop cluster with
 a particular storage cluster.
+
+******************
+Simple Test Plugin
+******************
+
+For simple benchmarks that consist of a single command line to execute, the Simple Test plugin can be used.
+The command line can be as complex as the Linux shell allows so multiple commands can be separated with a semicolon,
+"&&", "||", etc.. All output will be captured by the P3 Test Driver and it can be parsed by the
+Test Results Analyzer. The only requirement for the command is that it should return with an non-zero error
+if an error occurs.
+
+For example, the HBase YCSB test is executed using the following parameter:
+
+.. parsed-literal::
+
+  "command_template":
+    "../ycsb/bin/ycsb "
+    "%(ycsb_command)s "
+    "hbase10 "
+    "-P ../ycsb/workloads/%(workload)s "
+    "-p table=%(table_name)s "
+    "-p columnfamily=%(column_family)s "
+    "-p recordcount=%(record_count)d "
+    "-p operationcount=%(operation_count)d "
+    "-p maxexecutiontime=%(max_execution_time_sec)d "
+    "-threads %(threads)d "
+    "-target %(target_operations_per_sec)d "
+    "-s "
+    "-jvm-args=-Xmx%(ycsb_heap_MB)dm"
+
+The following parameters are used by the Simple Test plugin.
+
++-----------------------------+---------------------------------------------------------------------------------------------------------+
+| Parameter Name              | Description                                                                                             |
++=============================+=========================================================================================================+
+| command                     | The command line to execute. No variable substitution will occur.                                       |
++-----------------------------+---------------------------------------------------------------------------------------------------------+
+| command_template            | The command line to execute. Variable substitution will occur.                                          |
++-----------------------------+---------------------------------------------------------------------------------------------------------+
+| command_env                 | Dictionary of environment variables to set when running the command.                                    |
++-----------------------------+---------------------------------------------------------------------------------------------------------+
+| command_timeout_sec         | If specified, the command will timeout after this many seconds.                                         |
++-----------------------------+---------------------------------------------------------------------------------------------------------+
+| record_as_test              | The "test" parameter will be set to this value when the results are recorded.                           |
++-----------------------------+---------------------------------------------------------------------------------------------------------+
+| test                        | Should be "simple".                                                                                     |
++-----------------------------+---------------------------------------------------------------------------------------------------------+
+
+Refer to tests/example1_testgen.py for a complete example.
 
 
 **************************************
@@ -539,27 +457,6 @@ the test JSON file (--test). Values specified in the last test file will take pr
 +-----------------------------+---------------------------------------------------------------------------------------------------------+
 
 
-*************************************************
-Test Parameters to Enable MapReduce Debug Logging
-*************************************************
-
-To view full debug logs, set the parameters as described below.
-
-+--------------------+----------------------------------------------------------------------------------------------------------------------+
-| Parameter Name     | Value                                                                                                                |
-+====================+======================================================================================================================+
-| hadoop_command_env | This will enable trace logging for the MapReduce driver that launches and monitors the Hadoop Job.                   |
-|                    | {"HADOOP_ROOT_LOGGER": "TRACE,console"}                                                                              |
-+--------------------+----------------------------------------------------------------------------------------------------------------------+
-| hadoop_parameters  | This will enable trace logging for all mapper and reducer tasks.                                                     |
-|                    | ["-Dmapreduce.map.log.level=TRACE", "-Dmapreduce.reduce.log.level=TRACE", "-Dyarn.app.mapreduce.am.log.level=TRACE"] |
-+--------------------+----------------------------------------------------------------------------------------------------------------------+
-| mapred_log_dir     | To download mapper and reducer logs, you must provide a path to store them. They are not included in the             |
-|                    | JSON file.                                                                                                           |
-|                    | e.g.: "../data/mapred_results/mapredlogs"                                                                            |
-+--------------------+----------------------------------------------------------------------------------------------------------------------+
-
-
 *******************************
 Hadoop Common Output Parameters
 *******************************
@@ -653,6 +550,28 @@ For example:
 
 This value for base_directory will use the storage_hadoop_uri and data_size_MB parameters to build the base directory.
 Refer to the Python "%" operator for formatting options.
+
+
+*****************
+Password-less SSH
+*****************
+
+Password-less SSH is required from the user and server running the P3 Test Driver to all other servers involved in the
+test. This can be configured in a variety of ways.
+The easiest method is to use configure-ssh.py from
+https://github.com/claudiofahey/devops-scripts/blob/master/configure-ssh.py.
+
+.. parsed-literal::
+
+  [root\@driver-server p3_test_driver]# rpm -i centos6/sshpass*.rpm
+  [user\@driver-server p3_test_driver]# ssh-keygen -t rsa -b 4096
+  [user\@driver-server p3_test_driver]# configure-ssh.py -u root -p mypassword worker1 worker2 worker3
+
+Alternatively:
+
+.. parsed-literal::
+
+  [user\@driver-server p3_test_driver]# for n in {001..010} ; do ./configure-ssh.py -u root -p mypassword node$n.example.com ; done
 
 
 *******
@@ -768,55 +687,6 @@ New tests and storage systems can be added to the P3 Test Driver using a simple 
 See the various Python scripts in the plugins directory for examples, in particular tests/p3_test_simple.py.
 For extending the P3 Test Driver to run simple command lines, the Simple Test plugin can be used.
 
-******************
-Simple Test Plugin
-******************
-
-For simple benchmarks that consist of a single command line to execute, the Simple Test plugin can be used.
-The command line can be as complex as the Linux shell allows so multiple commands can be separated with a semicolon,
-"&&", "||", etc.. All output will be captured by the P3 Test Driver and it can be parsed by the
-Test Results Analyzer. The only requirement for the command is that it should return with an non-zero error
-if an error occurs.
-
-For example, the HBase YCSB test is executed using the following parameter:
-
-.. parsed-literal::
-
-  "command_template":
-    "../ycsb/bin/ycsb "
-    "%(ycsb_command)s "
-    "hbase10 "
-    "-P ../ycsb/workloads/%(workload)s "
-    "-p table=%(table_name)s "
-    "-p columnfamily=%(column_family)s "
-    "-p recordcount=%(record_count)d "
-    "-p operationcount=%(operation_count)d "
-    "-p maxexecutiontime=%(max_execution_time_sec)d "
-    "-threads %(threads)d "
-    "-target %(target_operations_per_sec)d "
-    "-s "
-    "-jvm-args=-Xmx%(ycsb_heap_MB)dm"
-
-The following parameters are used by the Simple Test plugin.
-
-+-----------------------------+---------------------------------------------------------------------------------------------------------+
-| Parameter Name              | Description                                                                                             |
-+=============================+=========================================================================================================+
-| command                     | The command line to execute. No variable substitution will occur.                                       |
-+-----------------------------+---------------------------------------------------------------------------------------------------------+
-| command_template            | The command line to execute. Variable substitution will occur.                                          |
-+-----------------------------+---------------------------------------------------------------------------------------------------------+
-| command_env                 | Dictionary of environment variables to set when running the command.                                    |
-+-----------------------------+---------------------------------------------------------------------------------------------------------+
-| command_timeout_sec         | If specified, the command will timeout after this many seconds.                                         |
-+-----------------------------+---------------------------------------------------------------------------------------------------------+
-| record_as_test              | The "test" parameter will be set to this value when the results are recorded.                           |
-+-----------------------------+---------------------------------------------------------------------------------------------------------+
-| test                        | Should be "simple" or "simple_hadoop".                                                                  |
-+-----------------------------+---------------------------------------------------------------------------------------------------------+
-
-Refer to tests/testgen_hbase_das.py for a complete example.
-
 *****
 HBase
 *****
@@ -844,14 +714,6 @@ Unfortunately, this version has a bug that causes a segfault
 A patched version is in the nmon folder of the p3 repository.
 After compiling it, modify the nmon command to include the "-g auto" parameter.
 The test results analyzer will automatically detect and load the additional disk metrics.
-
-
-************
-Optimization
-************
-
-This section is not yet documented. 
-Refer to tests/testgen\_*optimizer.py for examples of how to use the optimizer.
 
 
 ***********
@@ -892,3 +754,24 @@ To reduce the number of Isilon nodes in a cluster:
 #. Edit isilon_num_nodes in testgen*.py scripts.
 
 #. After the first benchmark, confirm that the network and disk traffic is equal among all Isilon nodes.
+
+**********************
+Developer Installation
+**********************
+
+Those that wish to modify P3 Test Driver should use the following steps to install
+an editable version and then upload to PyPI.
+
+.. parsed-literal::
+    pip install -e p3_test_driver
+    pip install twine
+    cd p3_test_driver
+    python setup.py sdist bdist_wheel
+    twine upload dist/*
+
+.. parsed-literal::
+    pip install -e p3_data
+    pip install twine
+    cd p3_data
+    python setup.py sdist bdist_wheel
+    twine upload dist/*

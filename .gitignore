@@ -5,7 +5,9 @@
 *.egg-info
 .idea/*
 .ipynb_checkpoints/*
+build/
 data/*
+dist/
 logs/*
 venv/*
 !example*.json

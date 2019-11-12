@@ -3,8 +3,8 @@ from setuptools import setup
 
 setup(
     name='p3_test_driver',
-    version='0.1',
-    description='P3 Test Driver is designed to run a variety of benchmarks using an easily expandble plug-in system.',
+    version='2.0',
+    description='P3 Test Driver is designed to run a variety of benchmarks using an easily expandable plug-in system.',
     url='http://github.com/claudiofahey/p3_test_driver',
     author='Claudio Fahey',
     author_email='claudio.fahey@dell.com',
@@ -24,4 +24,8 @@ setup(
         ],
     },
     zip_safe=False,
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ],
 )

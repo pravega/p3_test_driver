@@ -11,6 +11,7 @@ setup(
     packages=['p3_data'],
     install_requires=[
         'IPython',
+        'ipywidgets',
         'pandas',
         'PyYaml',
         'matplotlib',
@@ -20,4 +21,8 @@ setup(
         'sklearn',
     ],
     zip_safe=True,
+    classifiers=[
+        "Programming Language :: Python :: 3",
+        "Operating System :: OS Independent",
+    ],
 )
