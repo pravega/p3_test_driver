@@ -299,7 +299,10 @@ The following parameters are used by the Simple Test plugin.
 | test                        | Should be "simple".                                                                                     |
 +-----------------------------+---------------------------------------------------------------------------------------------------------+
 
-Refer to tests/example1_testgen.py for a complete example.
+Refer to the following examples:
+
+- `tests/example1_testgen.py<tests/example1_testgen.py>`_
+- https://github.com/claudiofahey/tensorflow-benchmark-util/blob/master/testgen.py
 
 
 **************************************
