@@ -301,7 +301,7 @@ The following parameters are used by the Simple Test plugin.
 
 Refer to the following examples:
 
-- `tests/example1_testgen.py<tests/example1_testgen.py>`_
+- `tests/example1_testgen.py <tests/example1_testgen.py>`_
 - https://github.com/claudiofahey/tensorflow-benchmark-util/blob/master/testgen.py
 
 
