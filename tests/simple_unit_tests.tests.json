@@ -2,7 +2,7 @@
     {
         "test": "simple",
         "command_template": ["/bin/echo","%(test)s","%(test_uuid)s"],
-        "result_filename": "/tmp/simple.json"
+        "result_filename": "/tmp/simple-%(test_uuid)s.json"
     },
     {
         "test": "simple",
