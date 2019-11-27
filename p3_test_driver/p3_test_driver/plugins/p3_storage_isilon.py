@@ -76,14 +76,14 @@ class IsilonStorage(StorageBase):
 
     def flush_cache(self):
         config = self.config
-        if not config['noop'] and config['isilon_flush']:
+        if config.get('noop', False) and config.get('isilon_flush', False):
             self.run_isilon_command('isi_for_array isi_flush')
 
     def run_isilon_command(self, cmd, *args, **kwargs):
         config = self.config
         assert 'isilon_user' in config
         assert 'isilon_host' in config
-        if config['noop']:
+        if config.get('noop', False):
             logging.info('# ssh ' % cmd)
             return 0, ''
         else:
