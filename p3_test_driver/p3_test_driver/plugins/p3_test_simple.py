@@ -4,8 +4,10 @@
 from __future__ import division
 
 import datetime
+import json
 import logging
 import os
+import re
 
 # P3 Libraries
 from p3_test_driver import p3_plugin_manager
@@ -81,7 +83,6 @@ class SimpleTest(StorageTest):
         if 'command_shell' not in rec:
             rec['command_shell'] = not isinstance(cmd, list)
 
-
         rec['_status_node'].set_status('Running command: %s' % str(cmd))
 
         with self.metrics_collector_context():
@@ -102,6 +103,14 @@ class SimpleTest(StorageTest):
             td = t1 - t0
 
             logging.info('exit_code=%d' % return_code)
+
+            # Parse any output matching a regex pattern in the json_regex list.
+            for json_regex in rec.get('json_regex', []):
+                m = re.search(json_regex, output, flags=re.MULTILINE)
+                if m:
+                    json_str = m.groups()[0]
+                    d = json.loads(json_str)
+                    rec.update(d)
 
             rec['utc_begin'] = t0.isoformat()
             rec['utc_end'] = t1.isoformat()
