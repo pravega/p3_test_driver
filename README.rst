@@ -770,7 +770,7 @@ an editable version and then upload to PyPI.
     pip install twine
     cd p3_test_driver
     python setup.py sdist bdist_wheel
-    twine upload dist/*
+    twine upload dist/p3_test_driver-2.0.1*
 
 .. parsed-literal::
     pip install -e p3_data
