@@ -1,11 +1,18 @@
+..
+    Copyright (c) Dell Inc., or its subsidiaries. All Rights Reserved.
+
+    Licensed under the Apache License, Version 2.0 (the "License");
+    you may not use this file except in compliance with the License.
+    You may obtain a copy of the License at
+
+        http://www.apache.org/licenses/LICENSE-2.0
+
 
 ==============
 P3 Test Driver
 ==============
 
 General Purpose Pluggable System Test Driver
-
-Claudio Fahey (claudio.fahey@dell.com)
 
 ********
 Overview
@@ -15,8 +22,9 @@ The P3 Test Driver is designed to run a variety of benchmarks using an easily ex
 
 It currently runs the following benchmarks:
 
-- TestDFSIO
-- Teragen, Terasort, Teravalidate
+- OpenMessaging Benchmark
+- Hadoop TestDFSIO
+- Hadoop Teragen, Terasort, Teravalidate
 - TPC-DS (Hive, HAWQ, Impala)
 - TPCx-HS
 - YCSB (HBase)
@@ -33,19 +41,6 @@ The output of the P3 Test Driver is a compressed JSON file consisting of key-val
 the parameters of the test (inputs), and the result of the test (outputs). These output files can be analyzed 
 using the related tool called Test Results Analyzer or any other tool that can read JSON files.
 
-A common factor in all benchmarks is that there are usually many different tunable parameters that can affect
-the benchmark results. For instance, in a MapReduce job, changing the number of reducers will impact the performance. 
-Normally, there is an optimal number of reducers for a particular job and values far away from this optimal value will 
-result in reduced performance.
-
-For instance, the user may specify that they want to run Terasort with 10, 30, 100, and 300 reducers in order to
-see which one is fastest.
-This can be extended along multiple dimensions to perform a simple grid search.
-For instance, if the user also wanted to test with different
-values of the reducer memory (i.e. 2048, 4096, and 8192 MB), then a cartesian product of these two
-dimensions could be created and every possibility would be executed. 
-In this example, there would be 4*3 = 12 different sets of parameters that would be tested. 
-
 
 *************
 Prerequisites
@@ -61,8 +56,6 @@ Prerequisites
     
 #.  The time zone on all systems should be UTC.
     Although not strictly required, this makes troubleshooting distributed systems much simpler.
-
-#.  To collect Linux metrics, nmon version 14g should be installed on all Linux hosts.
 
 
 ***********************************
@@ -95,18 +88,20 @@ Basic Installation using VirtualEnv (Recommended)
 -------------------------------------------------
 
 Perform these steps on the Linux server that will run the P3 Test Driver.
+Note that there is no need to clone this repository.
 
-#. virtualenv -p python3 venv
-#. source venv/bin/activate
-#. pip install p3_test_driver
+.. parsed-literal::
+    virtualenv -p python3 venv
+    source venv/bin/activate
+    pip install p3_test_driver
 
 
 ****************************
 Test and Configuration Files
 ****************************  
 
-The P3 Test Driver runs unattended as a command-line application. A set of JSON files
-instructs it run one or more tests.
+The P3 Test Driver runs unattended as a command-line application.
+A set of JSON or YAML files instructs it run one or more tests.
 
 An example *test* file is:
 
@@ -192,16 +187,10 @@ Of course, this can be performed simply by typing out a very large JSON file des
 all of the tests to run. However, a better approach is to programmatically create the JSON file
 that describes all of the tests.
 
-For an example, see the Python script tests/testgen_terasort_das.py. This will iterate over several
-common parameters (block_size_MiB, data_size_MiB). For each set of these common parameters
-it will run Teragen using several different
-values of map_tasks, then it will run Terasort using several different values of reduce_tasks, and then it
-will run Teravalidate. This cycle will repeat for all common parameters and identical tests
-can be repeated as desired. This script uses several levels of nested loops in order to run the sequence of jobs in
-the most efficient manner possible but taking into account the effect of previous jobs on subsequent
-jobs (e.g. the number of reducers during Terasort affects Teravalidate).
+For an example, see the Python script tests/example1_testgen.py.
+This will iterate over several parameters (param1, param2).
 
-When the script tests/teragen_terasort_das.py executes, it doesn't actually run the tests. It simply outputs
+When the script tests/example1_testgen.py executes, it doesn't actually run the tests. It simply outputs
 the JSON that describes the tests that should run. This JSON can then be fed into the P3 Test Driver to have it
 actually execute the tests.
 
@@ -302,7 +291,7 @@ The following parameters are used by the Simple Test plugin.
 Refer to the following examples:
 
 - `tests/example1_testgen.py <tests/example1_testgen.py>`_
-- https://github.com/claudiofahey/tensorflow-benchmark-util/blob/master/testgen.py
+- https://github.com/claudiofahey/ai-benchmark-util/blob/master/testgen.py
 
 
 **************************************
@@ -474,9 +463,9 @@ as well as the output parameters described below.
 +-----------------------------+---------------------------------------------------------------------------------------------------------+
 
 
-***********************************
-EMC Isilon Storage Input Parameters
-***********************************
+****************************************
+Dell EMC Isilon Storage Input Parameters
+****************************************
 
 These parameters can be specified in the configuration JSON file (--config) or
 the test JSON file (--test). Values specified in the last test file will take precedence.
@@ -515,9 +504,9 @@ the test JSON file (--test). Values specified in the last test file will take pr
 +-----------------------------+---------------------------------------------------------------------------------------------------------+
 
 
-***********************************
-EMC ECS Storage Input Parameters
-***********************************
+*************************************
+Dell EMC ECS Storage Input Parameters
+*************************************
 
 These parameters can be specified in the configuration JSON file (--config) or
 the test JSON file (--test). Values specified in the last test file will take precedence.
@@ -625,7 +614,7 @@ actively running the Hadoop NodeManager service.
 The agents key contains a dictionary (hash) whose key is the agent ID (a string uniquely identifying the host and metrics command)
 and whose value contains the start and optional stop command.
 
-As another example, to collect statistics from an EMC Isilon cluster, the following example configuration parameter
+As another example, to collect statistics from a Dell EMC Isilon cluster, the following example configuration parameter
 can be specified.
 
 .. parsed-literal::
@@ -671,6 +660,13 @@ near real-time view of the status of the test batch. It will show the number of 
 the number of warnings and errors, the elapsed time, and other test-specific
 information.
 
+If an HTML browser is not available or desired, you may convert it to text and view
+it using watch.
+
+.. parsed-literal::
+
+    watch html2text data/p3_test_driver/status/p3_test_driver.html
+
 When more details are needed for troubleshooting, refer to the P3 Test Driver log file.
 The file name is defined by the test_driver_log_filename configuration parameter.
 
@@ -679,7 +675,7 @@ Test Results Analyzer provides a monitoring dashboard.
 
 Since metrics are parsed only after a test completes, the metrics collected by the P3 Test Driver can't be viewed
 in real-time. If this is needed for troubleshooting, it is recommended to use the Linux nmon command
-(without parameters) or the isi statistics command directy.
+(without parameters) or the isi statistics command directly.
 
 
 *******************
@@ -706,17 +702,6 @@ YCSB must be installed for HBase benchmarking. Use the steps below to install it
   ln -s /etc/hbase/conf/hbase-site.xml ycsb/hbase10-binding/conf/
 
 To run the HBase tests, use tests/testgen_hbase_das.py.
-
-*********************************
-Additional Disk Metrics with nmon
-*********************************
-
-nmon 15h has an additional parameter that will gather more detailed disk metrics (-g auto).
-Unfortunately, this version has a bug that causes a segfault
-(See https://sourceforge.net/p/nmon/discussion/985541/thread/0ea2cb13/).
-A patched version is in the nmon folder of the p3 repository.
-After compiling it, modify the nmon command to include the "-g auto" parameter.
-The test results analyzer will automatically detect and load the additional disk metrics.
 
 
 ***********
