@@ -12,9 +12,9 @@ from setuptools import setup
 
 setup(
     name='p3_test_driver',
-    version='2.0.1',
+    version='2.0.2',
     description='P3 Test Driver is designed to run a variety of benchmarks using an easily expandable plug-in system.',
-    url='http://github.com/claudiofahey/p3_test_driver',
+    url='http://github.com/pravega/p3_test_driver',
     author='Claudio Fahey',
     author_email='claudio.fahey@dell.com',
     packages=['p3_test_driver'],
@@ -34,7 +34,8 @@ setup(
     },
     zip_safe=False,
     classifiers=[
-        "Programming Language :: Python :: 3",
+        "License :: OSI Approved :: Apache Software License",
         "Operating System :: OS Independent",
+        "Programming Language :: Python :: 3",
     ],
 )

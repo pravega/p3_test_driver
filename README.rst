@@ -694,7 +694,7 @@ YCSB must be installed for HBase benchmarking. Use the steps below to install it
 
 .. parsed-literal::
 
-  [root@hop-claudio-cdh1-master-0 p3]# 
+  [root@hadoop-master-0 p3]#
   wget https://github.com/brianfrankcooper/YCSB/releases/download/0.4.0/ycsb-0.4.0.tar.gz
   tar -xzvf ~/Downloads/ycsb-0.4.0.tar.gz
   mv ycsb-0.4.0 ycsb
@@ -755,7 +755,7 @@ an editable version and then upload to PyPI.
     pip install twine
     cd p3_test_driver
     python setup.py sdist bdist_wheel
-    twine upload dist/p3_test_driver-2.0.1*
+    twine upload dist/*
 
 .. parsed-literal::
     pip install -e p3_data
