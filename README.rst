@@ -74,6 +74,32 @@ by a disconnected VPN or WAN link. It is recommended to use a console that is on
 driver node. Consider using the Linux screen application.
 
 
+***************************************
+Quick Start for OpenMessaging Benchmark
+***************************************
+
+Run Benchmarks
+--------------
+
+.. parsed-literal::
+    git clone https://github.com/pravega/p3_test_driver
+    cd p3_test_driver
+    virtualenv -p python3 venv
+    source venv/bin/activate
+    pip install p3_test_driver
+    tests/testgen_pravega_ssh.py | p3_test_driver -t - -c config/pravega_ssh.config.yaml
+
+Run Jupyter for Analysis of Results
+-----------------------------------
+
+.. parsed-literal::
+    docker run -d -p 8888:8888 -e JUPYTER_ENABLE_LAB=yes -v "$PWD":/home/jovyan/work \
+        --name jupyter jupyter/scipy-notebook:1386e2046833
+    docker logs jupyter
+
+Open Notebook results-analyzer/results-analyzer-pravega.ipynb and run all cells.
+
+
 ************
 Installation
 ************
