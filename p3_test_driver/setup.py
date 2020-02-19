@@ -12,7 +12,7 @@ from setuptools import setup
 
 setup(
     name='p3_test_driver',
-    version='2.0.2',
+    version='2.0.3',
     description='P3 Test Driver is designed to run a variety of benchmarks using an easily expandable plug-in system.',
     url='http://github.com/pravega/p3_test_driver',
     author='Claudio Fahey',
