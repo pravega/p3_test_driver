@@ -81,7 +81,15 @@ Quick Start for OpenMessaging Benchmark
 Run Benchmarks
 --------------
 
+The steps below should be performed on the same system used
+to run Terraform to deploy OpenMessaging Benchmark.
+P3 Test Driver will inspect the Terraform state to determine
+the set of servers to use.
+
+You must use Python 3.7 or greater.
+
 .. parsed-literal::
+    python3 --version       # must be 3.7 or later
     git clone https://github.com/pravega/p3_test_driver
     cd p3_test_driver
     virtualenv -p python3 venv
